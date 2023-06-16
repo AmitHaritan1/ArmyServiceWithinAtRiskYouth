@@ -1,0 +1,654 @@
+---
+title: "project"
+output: html_document
+date: "2023-06-06"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r load-packages, message = FALSE, warning = FALSE}
+library(knitr)
+library(tidyverse)
+library(broom)
+library(htmltools)
+library(caret)
+library(tidymodels)
+library(schrute)
+library(lubridate)
+library(dplyr)
+library(zoo)
+library(randomForest)
+library(pROC)
+```
+
+
+```{r}
+
+child_df <-haven::read_sav("child_risk.sav")
+
+```
+
+# Change 2 to 0 and clean NA in the T3army column
+
+```{r}
+# Create a new table without na on the T3army column 
+
+child_df_rmna <- child_df[complete.cases(child_df$T3army), ]
+
+child_df_rmna$T3army[child_df_rmna$T3army == 2] <- 0
+
+table(child_df_rmna$T3army)
+
+```
+
+
+
+filter the data to the relevant columns and divide to train and test:
+
+```{r}
+
+relevant_col_vec = c("T3army", "M1.2", "M1.3", "M1.4", "M1.5", "M1.6", "B_life_skills_all",
+  "SenseCont1", "SenseCont2", "SenseCont3", "SenseCont4", "SenseCont5", "SenseCont6",
+  "Hope1", "Hope2", "HopeAll_T1", "B.EDUCATION", "T3_ACE_1", "T3_ACE_2", "T3_ACE_3",
+  "T3_ACE_4", "T3_ACE_5", "T3_ACE_6", "T3_ACE_7", "T3_ACE_8", "T3_ACE_9",
+  "Hacha1", "Hacha2", "Hacha3", "Hacha4", "Hacha5", "Hacha6", "Hacha8",
+  "Hacha9", "Hacha10","T3gender", "T3religiousness")
+
+relevant_col_vec_rf = c("T3army", "M1.2", "M1.3", "M1.4", "M1.5", "M1.6", "B_life_skills_all",
+  "SenseCont1", "SenseCont2", "SenseCont3", "SenseCont4", "SenseCont5", "SenseCont6",
+  "Hope1", "Hope2", "HopeAll_T1", "B.EDUCATION", "T3_ACE_1", "T3_ACE_2", "T3_ACE_3",
+  "T3_ACE_4", "T3_ACE_5", "T3_ACE_6", "T3_ACE_7", "T3_ACE_8", "T3_ACE_9", "Hacha3", "Hacha4", "Hacha5", "Hacha6", "Hacha10", "T3gender", "T3religiousness")
+
+child_df_rmna_col = child_df_rmna[relevant_col_vec]
+
+# train and test on clean data:
+
+set.seed(9)
+split <- initial_split(child_df_rmna_col, prop = 0.8)
+train <- training(split)
+test <- testing(split)
+
+dim(train)
+dim(test)
+```
+
+```{r}
+table(train$T3army)
+train$T3army <- as.factor(train$T3army)
+test$T3army <- as.factor(test$T3army)
+# view(train$T3army)
+```
+
+
+## Preprocessing and Date Engineering:
+
+```{r}
+
+# replacing ACE NA's with means:
+train$T3_ACE_1 <- na.aggregate(train$T3_ACE_1, FUN = median)
+train$T3_ACE_2 <- na.aggregate(train$T3_ACE_2, FUN = median)
+train$T3_ACE_3 <- na.aggregate(train$T3_ACE_3, FUN = median)
+train$T3_ACE_4 <- na.aggregate(train$T3_ACE_4, FUN = median)
+train$T3_ACE_5 <- na.aggregate(train$T3_ACE_5, FUN = median)
+train$T3_ACE_6 <- na.aggregate(train$T3_ACE_6, FUN = median)
+train$T3_ACE_7 <- na.aggregate(train$T3_ACE_7, FUN = median)
+train$T3_ACE_8 <- na.aggregate(train$T3_ACE_8, FUN = median)
+train$T3_ACE_9 <- na.aggregate(train$T3_ACE_9, FUN = median)
+
+
+# Calculate medians for the specific columns in the train set
+column_medians <- train %>%
+  summarise(across(c(T3_ACE_1, T3_ACE_2, T3_ACE_3, T3_ACE_4, T3_ACE_5, T3_ACE_6, T3_ACE_7, T3_ACE_8, T3_ACE_9), median, na.rm = TRUE))
+
+# Replace NA values in the specified columns of the test set with their respective medians from the train set
+test <- test %>%
+  mutate(
+    T3_ACE_1 = if_else(is.na(T3_ACE_1), column_medians$T3_ACE_1, T3_ACE_1),
+    T3_ACE_2 = if_else(is.na(T3_ACE_2), column_medians$T3_ACE_2, T3_ACE_2),
+    T3_ACE_3 = if_else(is.na(T3_ACE_3), column_medians$T3_ACE_3, T3_ACE_3),
+    T3_ACE_4 = if_else(is.na(T3_ACE_4), column_medians$T3_ACE_4, T3_ACE_4),
+    T3_ACE_5 = if_else(is.na(T3_ACE_5), column_medians$T3_ACE_5, T3_ACE_5),
+    T3_ACE_6 = if_else(is.na(T3_ACE_6), column_medians$T3_ACE_6, T3_ACE_6),
+    T3_ACE_7 = if_else(is.na(T3_ACE_7), column_medians$T3_ACE_7, T3_ACE_7),
+    T3_ACE_8 = if_else(is.na(T3_ACE_8), column_medians$T3_ACE_8, T3_ACE_8),
+    T3_ACE_9 = if_else(is.na(T3_ACE_9), column_medians$T3_ACE_9, T3_ACE_9)
+  )
+
+
+
+# Repair Na values:
+
+# filling n/a in "M1.2" with most common value
+
+# Find the most common non-NA value in the 'M1.2' column
+most_common <- names(which.max(table(train$M1.2, exclude = NA)))
+
+
+# Replace NA values in 'M1.2' column with the most common non-NA value
+train$M1.2[is.na(train$M1.2)] <- most_common
+test$M1.2[is.na(test$M1.2)] <- most_common
+
+
+# filling n/a in "B_life_skills_all":
+
+# Select columns M1.2, M1.3, M1.4, M1.5, and M1.6
+selected_columns <- c("M1.2", "M1.3", "M1.4", "M1.5", "M1.6")
+
+# Convert selected columns to numeric and store as a new dataframe
+numeric_data <- as.data.frame(train[selected_columns], stringsAsFactors = FALSE)
+numeric_data <- apply(numeric_data, 2, function(x) as.numeric(as.character(x)))
+
+# Calculate row-wise averages for the numeric data excluding NA values
+row_averages <- rowMeans(numeric_data, na.rm = TRUE)
+
+# Replace NA values in 'B_life_skills_all' column with row-wise averages
+train$B_life_skills_all[is.na(train$B_life_skills_all)] <- row_averages[is.na(train$B_life_skills_all)]
+
+test$B_life_skills_all[is.na(test$B_life_skills_all)]<- row_averages[is.na(test$B_life_skills_all)]
+
+train$M1.2 <- as.double(train$M1.2)
+
+
+# filling SenseCont with the most common value
+
+selected_columns <- c("SenseCont1","SenseCont2","SenseCont3","SenseCont4","SenseCont5","SenseCont6")
+
+for (col in selected_columns) {
+ # Convert the column to character type
+  train[[col]] <- as.character(train[[col]])
+
+  # Find the most common non-NA value in the column
+  most_common <- names(which.max(table(train[[col]], exclude = NA)))
+
+  # Replace NA values with the most common non-NA value
+  train[[col]][is.na(train[[col]])] <- most_common
+  train[[col]] <- as.double(train[[col]])
+
+  # test refill
+  test[[col]][is.na(test[[col]])] <- as.double(most_common)
+  test[[col]] <- as.double(test[[col]])
+
+}
+  
+
+# fill Hope1, Hope2 with the most common value.  
+# HopeAll_T1 with the average of Hope1 & Hope2.
+
+hope_col <- c("Hope1", "Hope2")
+for (col in hope_col) {
+ # Convert the column to character type
+  train[[col]] <- as.character(train[[col]])
+
+  # Find the most common non-NA value in the column
+  most_common <- names(which.max(table(train[[col]], exclude = NA)))
+
+  # Replace NA values with the most common non-NA value
+  train[[col]][is.na(train[[col]])] <- most_common
+  train[[col]] <- as.double(train[[col]])
+  
+  # Replace NA values with the most common non-NA value
+  test[[col]][is.na(test[[col]])] <- most_common
+  test[[col]] <- as.double(test[[col]])
+
+  
+}
+
+
+# Store selected columns as a new dataframe
+df_hopes <- as.data.frame(train[hope_col], stringsAsFactors = FALSE)
+
+# Calculate row-wise averages for the numeric data excluding NA values
+row_averages <- rowMeans(df_hopes, na.rm = TRUE)
+
+# Replace NA values in 'HopeAll_T1' column with row-wise averages
+train$HopeAll_T1[is.na(train$HopeAll_T1)] <- row_averages[is.na(train$HopeAll_T1)]
+
+
+# Store selected columns as a new dataframe
+df_hopes_train <- as.data.frame(test[hope_col], stringsAsFactors = FALSE)
+
+# Calculate row-wise averages for the numeric data excluding NA values
+row_averages_test <- rowMeans(df_hopes_train, na.rm = TRUE)
+test$HopeAll_T1[is.na(test$HopeAll_T1)] <- row_averages_test[is.na(test$HopeAll_T1)]
+
+# Fill B.Education:
+freq_table <- table(train$B.EDUCATION)
+
+train$B.EDUCATION[!complete.cases(train$B.EDUCATION)] <- 4
+
+
+# HACHA3 & HACHA10
+
+# If there is a value that is not na in Hacha 10 - replace the na with 2:
+train$Hacha3 <- ifelse(!is.na(train$Hacha10), 2, 1)
+
+# Calculate the mean excluding NA values
+mean_value <- mean(train$Hacha10, na.rm = TRUE)
+
+# Fill NA values with the mean
+train$Hacha10[is.na(train$Hacha10)] <- mean_value
+
+
+# HACHA2 & HACHA9
+
+# If there is a value that is not NA in Hacha9, replace the NA with 2:
+train$Hacha2 <- ifelse(!is.na(train$Hacha9), 2, 1)
+
+# Calculate the mean excluding NA values
+mean_value <- mean(train$Hacha9, na.rm = TRUE)
+
+# Fill NA values with the mean
+train$Hacha9[is.na(train$Hacha9)] <- mean_value
+
+
+# HACHA1 & HACHA8
+
+# If there is a value that is not NA in Hacha8, replace the NA with 1:
+train$Hacha1 <- ifelse(!is.na(train$Hacha8), 1, 2)
+
+# Calculate the mean excluding NA values
+mean_value <- mean(train$Hacha8, na.rm = TRUE)
+
+# Fill NA values with the mean
+train$Hacha8[is.na(train$Hacha8)] <- mean_value
+
+# HACHA4 HACHA5 HACHA6:
+
+
+median(train$Hacha4)
+median(train$Hacha5)
+median(train$Hacha6)
+
+train$Hacha4[!complete.cases(train$Hacha4)] <- median(train$Hacha4)
+train$Hacha5[!complete.cases(train$Hacha5)] <- median(train$Hacha5)
+train$Hacha6[!complete.cases(train$Hacha6)] <- median(train$Hacha6)
+
+
+# TEST - Fill B.Education:
+freq_table <- table(train$B.EDUCATION)
+
+test$B.EDUCATION[!complete.cases(test$B.EDUCATION)] <- 4
+
+# TEST - HACHA3 & HACHA10
+
+# If there is a value that is not na in Hacha 10 - replace the na with 2:
+test$Hacha3 <- ifelse(!is.na(test$Hacha10), 2, 1)
+
+# Calculate the mean excluding NA values
+mean_value <- mean(train$Hacha10, na.rm = TRUE)
+
+# Fill NA values with the mean
+test$Hacha10[is.na(test$Hacha10)] <- mean_value
+
+## TEST - HACHA2 & HACHA9
+
+# If there is a value that is not NA in Hacha9, replace the NA with 2:
+test$Hacha2 <- ifelse(!is.na(test$Hacha9), 2, 1)
+
+# Calculate the mean excluding NA values
+mean_value <- mean(train$Hacha9, na.rm = TRUE)
+
+# Fill NA values with the mean
+test$Hacha9[is.na(test$Hacha9)] <- mean_value
+
+# TEST - HACHA1 & HACHA8
+
+# If there is a value that is not NA in Hacha8, replace the NA with 1:
+test$Hacha1 <- ifelse(!is.na(test$Hacha8), 1, 2)
+
+# Calculate the mean excluding NA values
+mean_value <- mean(train$Hacha8, na.rm = TRUE)
+
+# Fill NA values with the mean
+test$Hacha8[is.na(test$Hacha8)] <- mean_value
+
+
+# TEST - HACHA4 HACHA5 HACHA6:
+
+test$Hacha4[!complete.cases(test$Hacha4)] <- mean(train$Hacha4)
+test$Hacha5[!complete.cases(test$Hacha5)] <- mean(train$Hacha5)
+test$Hacha6[!complete.cases(test$Hacha6)] <- mean(train$Hacha6)
+
+# fill all missing values in the test set with the means of the train set:
+
+# Identify columns with NA values in the test set
+na_columns <- colSums(is.na(test)) > 0
+
+# Calculate means for the identified columns in the train set
+column_means <- train %>%
+  summarise(across(any_of(names(test)[na_columns]), mean, na.rm = TRUE))
+
+# Replace NA values in the identified columns of the test set with their respective means from the train set
+test <- test %>%
+  mutate(across(any_of(names(test)[na_columns]), ~ if_else(is.na(.), column_means[[cur_column()]], .)))
+
+
+na_counts <- colSums(is.na(test))
+print(na_counts)
+
+```
+
+
+
+#### Change columns to numeric
+
+```{r}
+train$B_life_skills_all <- as.numeric(train$B_life_skills_all)
+train$M1.4 <- as.numeric(train$M1.4)
+train$M1.6 <- as.numeric(train$M1.6)
+train$SenseCont3 <- as.numeric(train$SenseCont3)
+train$Hope2 <- as.numeric(train$Hope2)
+train$HopeAll_T1 <- as.numeric(train$HopeAll_T1)
+train$Hope1 <- as.numeric(train$Hope1)
+train$M1.3 <- as.numeric(train$M1.3)
+train$SenseCont4 <- as.numeric(train$SenseCont4)
+train$SenseCont2 <- as.numeric(train$SenseCont2)
+train$SenseCont5 <- as.numeric(train$SenseCont5)
+train$SenseCont1 <- as.numeric(train$SenseCont1)
+train$SenseCont6 <- as.numeric(train$SenseCont6)
+
+
+
+# test$SenseCont1 <- as.numeric(as.character(test$SenseCont1))
+train$Hacha10 <- as.numeric(train$Hacha10)
+
+
+
+train$T3army <- as.factor(train$T3army)
+view(train)
+train$M1.2 <- as.numeric(train$M1.2)
+test$M1.2 <- as.numeric(test$M1.2)
+# 
+# 
+# 
+# # Convert specific columns to numeric
+# numeric_cols <- c("B_life_skills_all", "M1.4", "M1.6", "SenseCont3", "Hope2", "HopeAll_T1", "Hope1", "M1.3", "SenseCont4", "SenseCont2", "SenseCont5", "SenseCont1", "SenseCont6", "Hacha10")
+# train[numeric_cols] <- lapply(train[numeric_cols], as.numeric)
+# 
+# # Convert the T3army column to a factor
+# train$T3army <- as.factor(train$T3army)
+# 
+# # Convert the M1.2 column to numeric in both train and test datasets
+# train$M1.2 <- as.numeric(train$M1.2)
+# test$M1.2 <- as.numeric(test$M1.2)
+# 
+# # View the updated train dataset
+# view(train)
+
+
+```
+
+
+#### Feature Importence - Random Forest:
+```{r}
+# Remove rows with missing values
+train2 <- na.omit(train)
+
+# Train a Random Forest model
+model <- randomForest(T3army ~ ., data = train2)
+
+# Calculate feature importance
+importance <- as.data.frame(importance(model))
+
+# Sort the dataframe in descending order based on MeanDecreaseGini
+importance <- importance %>%
+  arrange(desc(MeanDecreaseGini))
+
+
+# Print the feature importance
+print(importance)
+
+
+```
+
+
+
+#### Fixing imbalances of the data
+
+```{r}
+#  up-sampling the train , repair imbalnce data.
+
+train <- upSample(x = train[, -which(names(train) == "T3army")], y = train$T3army, yname = "T3army")
+
+# view(resampled_data)
+```
+
+
+
+
+## Explortory:
+
+#### Logisitic Regression Between Families of Features
+
+```{r}
+subset_df_ace <- train[, c("T3army", "T3_ACE_1", "T3_ACE_2", "T3_ACE_3", "T3_ACE_4", "T3_ACE_5", "T3_ACE_6", "T3_ACE_7", "T3_ACE_8", "T3_ACE_9")]
+
+subset_df_Hope <- train[, c("SenseCont1", "SenseCont2", "SenseCont3", "SenseCont4", "SenseCont5", "SenseCont6", "Hope1", "Hope2", "HopeAll_T1", "T3army")]
+
+
+subset_df_skills <- train[, c("M1.2", "M1.3", "M1.4", "M1.5", "M1.6", "B_life_skills_all","T3army")]
+
+subset_df_EDUCATION <- train[, c( "Hacha1", "Hacha2", "Hacha3", "Hacha4", "Hacha5", "Hacha6", "Hacha8","Hacha9", "Hacha10","B.EDUCATION","T3army")]
+
+subset_df_general<- train[, c("T3religiousness", "T3gender","T3army")]
+
+
+print("********Logistic Regration for Traumas Fearute********")
+subset_df_ace <- as.data.frame(lapply(subset_df_ace, as.numeric), stringsAsFactors = FALSE)
+logistic_model <- glm(as.factor(T3army) ~ ., data = subset_df_ace, family = binomial)
+summary(logistic_model)
+
+print("********Logistic Regration for Hope Fearute********")
+subset_df_Hope <- as.data.frame(lapply(subset_df_Hope, as.numeric), stringsAsFactors = FALSE)
+logistic_model <- glm(as.factor(T3army) ~ ., data = subset_df_Hope, family = binomial)
+summary(logistic_model)
+
+print("********Logistic Regration for Skills Fearute********")
+subset_df_skills <- as.data.frame(lapply(subset_df_skills, as.numeric), stringsAsFactors = FALSE)
+logistic_model <- glm(as.factor(T3army) ~ ., data = subset_df_skills, family = binomial)
+summary(logistic_model)
+
+
+print("********Logistic Regration for EDUCATION Fearute********")
+subset_df_EDUCATION <- as.data.frame(lapply(subset_df_EDUCATION, as.numeric), stringsAsFactors = FALSE)
+logistic_model <- glm(as.factor(T3army) ~ ., data = subset_df_EDUCATION, family = binomial)
+summary(logistic_model)
+
+
+print("********Logistic Regration for General Fearute********")
+subset_df_general <- as.data.frame(lapply(subset_df_general, as.numeric), stringsAsFactors = FALSE)
+logistic_model <- glm(as.factor(T3army) ~ ., data = subset_df_general, family = binomial)
+summary(logistic_model)
+```
+
+
+## Predictive:
+
+
+### Logistic Regression Model:
+
+#### Recipe:
+
+```{r}
+# replace . with the columns we want as features
+df_rec <- recipe(
+  T3army ~ .,
+  data = train
+)
+
+df_rec <- df_rec %>%
+  step_cut(SenseCont1, SenseCont2, SenseCont3, SenseCont4, SenseCont5, SenseCont6, Hope1, Hope2, HopeAll_T1, B.EDUCATION, T3_ACE_1, T3_ACE_2, T3_ACE_3, T3_ACE_4, T3_ACE_5, T3_ACE_6, T3_ACE_7, T3_ACE_8, T3_ACE_9, M1.4, M1.5, M1.6, B_life_skills_all, breaks = c(0, 1)) %>%
+    # step_cut(T3religiousness, breaks = c(0, 1, 4)) %>%
+
+  # REMOVE NON-SEGNIFICANT FEATURES AND CHECK IF THIS DOESNT BOTHER
+    step_rm(B.EDUCATION, T3_ACE_6, T3_ACE_7, Hacha2, T3_ACE_8, T3_ACE_4, Hacha1, Hacha3)%>%
+
+  # step_rm(Hacha2, Hacha9, Hacha1, Hacha8)%>%
+  step_dummy(all_nominal(), -all_outcomes()) %>%
+  step_zv(all_predictors())%>%
+  step_zv(all_predictors())
+
+
+df_mod <- logistic_reg() %>%
+  set_engine("glm")
+
+
+df_wflow <- workflow() %>%
+  add_model(df_mod) %>%
+  add_recipe(df_rec)
+
+
+df_fit <- df_wflow %>%
+  fit(data = train)
+
+
+df_pred <- predict(df_fit, test, type = "prob") %>%
+  bind_cols(test)
+
+
+cutoff_prob <- 0.3
+
+predicted_vector <- ifelse(df_pred$.pred_1 >= cutoff_prob, 1, 2)
+
+
+df_table <- df_pred %>%
+  mutate(
+    spam      = if_else(T3army == 1, "Served", "not Served"),
+    spam_pred = if_else(.pred_1 > cutoff_prob, "child labelled as Served", "child labelled as not Served")
+    ) %>%
+  count(spam_pred, spam) %>%
+  pivot_wider(names_from = spam, values_from = n)
+
+
+df_mat <- as.matrix(df_table[,-1])
+df_mat[is.na(df_mat)] <- 0
+
+
+TP <- df_mat[1, 1] # not spam, not predicted
+FP <- df_mat[1, 2] # not spam, predicted
+FN <- df_mat[2, 1] # spam, not predicted
+TN <- df_mat[2, 2] # spam, predicted
+
+recall <- TP/(TP+FN)
+precision <- TP/(TP+FP)
+f1 <- 2*(precision*recall)/(precision + recall)
+
+df_mat
+
+cat("\nRecall: ", recall, "\n")
+cat("Precision: ", precision, "\n")
+cat("F1-score: ", f1, "\n")
+```
+
+```{r}
+
+roc_object <- roc( test$T3army, as.numeric(predicted_vector))
+# calculate area under curve
+auc(roc_object)
+
+plot(roc_object, main = "ROC Curve", print.auc = TRUE, auc.polygon = TRUE, grid = TRUE)
+
+```
+
+### Random Forest:
+
+
+creating train with relevant features:
+
+
+```{r}
+
+# train and test on clean data:
+
+train_rf <- train[relevant_col_vec_rf]
+test_rf <- test[relevant_col_vec_rf]
+
+view(train_rf)
+```
+
+
+
+```{r}
+train_rf$T3army <- as.factor(train_rf$T3army)
+
+# Train a Random Forest model
+model <- randomForest(T3army ~ ., data = train_rf,na.action=na.exclude)
+
+predictions <- predict(model, newdata = test_rf)
+
+# Create confusion matrix
+confusion_matrix <- table(Actual = test_rf$T3army, Predicted = predictions)
+
+roc_object <- roc( test_rf$T3army, as.numeric(predictions))
+ 
+# calculate area under curve
+auc(roc_object)
+plot(roc_object, main = "ROC Curve", print.auc = TRUE, auc.polygon = TRUE, grid = TRUE,col="grey1")
+
+
+example <- confusionMatrix(data=predictions, reference = test_rf$T3army)
+example
+
+
+TP <- confusion_matrix[1, 1] # not spam, not predicted
+FP <- confusion_matrix[1, 2] # not spam, predicted
+FN <- confusion_matrix[2, 1] # spam, not predicted
+TN <- confusion_matrix[2, 2] # spam, predicted
+
+recall <- TP/(TP+FN)
+precision <- TP/(TP+FP)
+f1 <- 2*(precision*recall)/(precision + recall)
+
+
+cat("\nRecall: ", recall, "\n")
+cat("Precision: ", precision, "\n")
+cat("F1-score: ", f1, "\n")
+
+```
+
+
+#### Optional - Correlation Between Signle
+
+```{r}
+# Convert T3army column to numeric if it's not already numeric
+train$T3army <- as.numeric(as.character(train$T3army))
+
+# Calculate correlation between T3army and other numeric columns
+correlations <- cor(train[, sapply(train, is.numeric)])
+cor_with_T3army <- correlations[, "T3army"]
+
+# Print correlation values
+cor_with_T3army
+
+# Calculate correlation (r) between all columns and T3army
+numeric_cols <- sapply(train, is.numeric)
+correlations <- cor(train)
+
+# Calculate r^2 and adjusted r^2 between all columns and T3army
+results <- lapply(names(train), function(col) {
+  if (col != "T3army") {
+    model <- lm(T3army ~ ., data = train[, c("T3army", col)])
+    r_squared <- summary(model)$r.squared
+    adj_r_squared <- summary(model)$adj.r.squared
+    
+    list(Column = col, r_squared = r_squared, adjusted_r_squared = adj_r_squared)
+  }
+})
+
+# Combine the results into a data frame
+results_df <- do.call(rbind, results)
+
+results_df
+
+```
+
+
+
