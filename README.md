@@ -9,7 +9,8 @@ This Markdown file describes the data folder structure and organization ...
 
 Data feature list (valid features):
 
-T3Army - This field indicates whether a child serve in the army or not.
+# T3Army - 
+This field indicates whether a child serve in the army or not.
 Missing values were ignored.
 
 | Value |       Label     |
@@ -18,7 +19,7 @@ Missing values were ignored.
 |   2   |  Did not served |
 
 
-#Life skils features:
+# Life skils features:
 
 There are 5 scales of preparedness to independence life.
 All scales set between 1-4 with gaps of 0.25, and each field have specific category:
