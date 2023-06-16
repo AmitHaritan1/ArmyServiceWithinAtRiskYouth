@@ -1,7 +1,8 @@
 
 # SISE2601 Project data description
-## ArmyServiceWithinAtRiskYouth
+### ArmyServiceWithinAtRiskYouth
 Final project in Advanced Data Analysis in R course
+
 ================
 
 Team name - Danielle Eldor, Shir Bernstein and Amit Haritan.
