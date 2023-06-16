@@ -116,7 +116,7 @@ Hacha3 and Hacha10 are about the army preparation:
  - Hacha10 is scaled from 1-5 accending about their army preparation.
 
 
-#General
+# General
 
 T3gender -  This field indicates the children' gender:
 
