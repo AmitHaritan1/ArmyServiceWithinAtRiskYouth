@@ -2,6 +2,7 @@
 Final project in Advanced Data Analysis in R course
 # SISE2601 Project data description
 ================
+
 Team name - Danielle Eldor, Shir Bernstein and Amit Haritan.
 
 This Markdown file describes the data folder structure and organization ...
