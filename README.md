@@ -1,6 +1,6 @@
 
 # SISE2601 Project data description
-### ArmyServiceWithinAtRiskYouth
+### Army Service Within At-Risk Youth
 Final project in Advanced Data Analysis in R course
 
 ================
