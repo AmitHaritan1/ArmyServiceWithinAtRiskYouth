@@ -5,13 +5,15 @@ Final project in Advanced Data Analysis in R course
 
 ================
 
-Team name - Danielle Eldor, Shir Bernstein and Amit Haritan.
+Team name - Danielle Eldor, Shir Bernstein and Amit Haritan
 
-This Markdown file describes the data folder structure and organization ...
+This markdown file describes the data folder structure and organization ...
 
 Data feature list (valid features):
 
-# T3Army - 
+
+# T3Army:
+
 This field indicates whether a child serve in the army or not.
 Missing values were ignored.
 
@@ -23,8 +25,8 @@ Missing values were ignored.
 
 # Life skils features:
 
-There are 5 scales of preparedness to independence life.
-All scales set between 1-4 with gaps of 0.25, and each field have specific category:
+There are 5 scales of preparedness to an independent adult life.
+All scales set between 1-4 with gaps of 0.25, and each field contains a specific category:
 
   - M1.2 - education
   - M1.3 - employment
@@ -32,14 +34,14 @@ All scales set between 1-4 with gaps of 0.25, and each field have specific categ
   - M1.5 - social relations
   - M1.6 - normative behavior
   
+  - B_life_skills_all - summarizes the children's skills of the 2nd measurement (T2).
+    This column has continuous values acseding from 1-4.
   
-  - B_life_skills_all - summarized the children's skills of the 2nd measurement.
-    This column has contentious values from 1-4 acceding.
   
-  
-# Hopes
+# Hopes:
 
 There are 6 sentences that show the child's depiction of future struggles and coping in scale of 1-5:
+
 | Value |        Label           |
 |:-----:|:----------------------:|
 |   1   |   Do not agree at all  |
@@ -50,6 +52,7 @@ There are 6 sentences that show the child's depiction of future struggles and co
  
 
 The sentences:
+
 - SenseCont1 - What happens to me may depend mainly on me.
 - SenseCont2 - I can do almost anything I set my mind to.
 - SenseCont3 - Many times I feel that I cannot deal with my problems in life.
@@ -58,8 +61,8 @@ The sentences:
 - SenseCont6 - I can only slightly change the things that are important to me in life.
 
 
-Hope1 + 2  - Those fields indicates the measure of hope for the future.
-Where Hope1 is about the hope and Hope2 is about patterns.
+Hope1, Hope2  - Fields that indicate a measure of hope for the future.
+Hope1 is about the feelings of hope themselves and Hope2 is about patterns of hope.
 
 
 HopeAll_T1 - summarized the children's hopes of the 1st measurement.
@@ -79,8 +82,9 @@ B.EDUCATION - This field indicates the children answer about "What education or 
                 
 
 
-# Traumas 
-The next fields containing descriptions of traumatic events that the child may have experienced during their childhood up to the age of 18. The values are if the child experienced the trauma or not by:
+# Traumas:
+
+The next fields contain descriptions of traumatic events that the teens may have experienced during their childhood up to the age of 18. The answers are labeled as following:
 
 | Value |  Label |
 |:-----:|:------:|
@@ -88,7 +92,7 @@ The next fields containing descriptions of traumatic events that the child may h
 |   2   |   Yes  |
 
 
-The traumas:
+The trauma descriptions:
 
 - T3_ACE_1 - Has a parent or other adult in the home often cursed, insulted, humiliated you, or behaved in a way that made you fear you might be physically harmed?
 - T3_ACE_2 - Has a parent or other adult at home often physically hurt you (eg, pulled, pushed, dragged, or thrown something at you)? Or left marks of violence on your body?
@@ -102,25 +106,25 @@ The traumas:
 
 
 
-Hacha1-10:
-Those fields are about preparation programs and plans for the children future.
-we specific want to use in Hacha3 and Hacha10.
+Hacha1-10 - Fields that are about preparation programs, extracurriculars and plans for the future.
+We specifically want to use in Hacha3 and Hacha10.
 
 Hacha3 and Hacha10 are about the army preparation:
 
- - Hacha3 is about if they got good army preparation.
+ - Hacha3 asks if they got good army preparation.
  
 | Value |  Label |
 |:-----:|:------:|
 |   1   |   No   |
 |   2   |   Yes  |
 
- - Hacha10 is scaled from 1-5 accending about their army preparation.
+ - Hacha10 is an acsending scale from 1-5 rating the army preparation they received.
 
 
-# General
 
-T3gender -  This field indicates the children' gender:
+# General:
+
+T3gender -  This field contains the children's gender:
 
 | Value |  Label |
 |:-----:|:------:|
@@ -128,7 +132,7 @@ T3gender -  This field indicates the children' gender:
 |   2   |   men  |
 
 
-T3religiousness - This field indicates the children' religiousness:
+T3religiousness - This field indicates the children's level of religiousness:
 
 | Value |           Label           |
 |:-----:|:-------------------------:|
