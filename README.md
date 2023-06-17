@@ -8,10 +8,12 @@ Team name - Danielle Eldor, Shir Bernstein and Amit Haritan
 
 This markdown file describes the data folder structure and organization ...
 
+The data suggests that childhood adversity and trauma, such as loss, parental issues, maltreatment, and social difficulties, can have long-lasting effects on individuals. These adverse experiences are associated with poor health, behavioral problems, and negative outcomes in adulthood, including mental health issues,  low incomes, and difficulties in education and employment. These effects tend to emerge during young adulthood, a critical phase when individuals transition into adult roles and responsibilities. If protective factors are lacking during childhood and adolescence, young adults who have experienced adverse childhood experiences may struggle to cope with the challenges they face, leading to lower adaptation and potential mental and behavioral dysfunction. The data measures 3 different time period throughout 10 years, of a constant group of at-risk youth.
+
 Data feature list (valid features):
 
 
-# T3Army:
+# T3Army
 
 This field indicates whether a child serve in the army or not.
 Missing values were ignored.
@@ -22,7 +24,7 @@ Missing values were ignored.
 |   2   |  Did not served |
 
 
-# Life skils features:
+# Life skils features
 
 There are 5 scales of preparedness to an independent adult life.
 All scales set between 1-4 with gaps of 0.25, and each field contains a specific category:
@@ -37,7 +39,7 @@ All scales set between 1-4 with gaps of 0.25, and each field contains a specific
     This column has continuous values acseding from 1-4.
   
   
-# Hopes:
+# Hopes
 
 There are 6 sentences that show the child's depiction of future struggles and coping in scale of 1-5:
 
@@ -81,7 +83,7 @@ B.EDUCATION - This field indicates the children answer about "What education or 
                 
 
 
-# Traumas:
+# Traumas
 
 The next fields contain descriptions of traumatic events that the teens may have experienced during their childhood up to the age of 18. The answers are labeled as following:
 
@@ -121,7 +123,7 @@ Hacha3 and Hacha10 are about the army preparation:
 
 
 
-# General:
+# General
 
 T3gender -  This field contains the children's gender:
 
