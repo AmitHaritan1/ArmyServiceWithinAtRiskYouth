@@ -125,7 +125,7 @@ Hacha3 and Hacha10 are about the army preparation:
 
 # General
 
-T3gender -  This field contains the children's gender:
+- T3gender -  This field contains the children's gender:
 
 | Value |  Label |
 |:-----:|:------:|
@@ -133,7 +133,7 @@ T3gender -  This field contains the children's gender:
 |   2   |   men  |
 
 
-T3religiousness - This field indicates the children's level of religiousness:
+- T3religiousness - This field indicates the children's level of religiousness:
 
 | Value |           Label           |
 |:-----:|:-------------------------:|
