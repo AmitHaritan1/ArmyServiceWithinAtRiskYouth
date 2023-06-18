@@ -624,4 +624,61 @@ results_df
 ```
 
 
+#### Plots
 
+
+```{r}
+
+#Gender
+
+table_data <- table(train$T3army, train$T3gender)
+table_data[1,] <- table_data[1,] / sum(table_data[1,])
+table_data[2,] <- table_data[2,] / sum(table_data[2,])
+df_table_data <- as.data.frame(table_data)
+ggplot(data = df_table_data, aes(x = factor(Var2), y = Freq, fill = as.factor(Var1))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = "T3_ACE_3", y = "Frequency") +
+  scale_fill_manual(values = c("#C11F1F","#7DB84F"),
+                    labels = c("1" = "Served", "0" = "Did Not Serve")) +
+  labs(fill = "Army Service", title = "Recruitment According to Gender")+ 
+  theme_minimal() + xlab("Gender") +
+  scale_x_discrete(labels = c("Women", "Men")) +
+  geom_text(aes(label = scales::percent(Freq), y = Freq), 
+            position = position_dodge(width = 0.9), 
+            vjust = -0.5)
+
+# ace_5
+
+table_data <- table((train$T3_ACE_5), train$T3army)
+table_data[1,] <- table_data[1,] / sum(table_data[1,])
+table_data[2,] <- table_data[2,] / sum(table_data[2,])
+df_table_data <- as.data.frame(table_data)
+ggplot(data = df_table_data, aes(x = factor(Var2), y = Freq, fill = as.factor(Var1))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = "T3_ACE_3", y = "Frequency") +
+  scale_fill_manual(values = c("lightblue", "purple4"),
+  labels = c("1" = "Haven't Experienced", "2" = "Experienced"))+
+  labs(fill = "Growing Up in a Difficult \nEnvironment at Home", title = "Childhood Trumas in Relation to Recruitment")+ 
+  theme_minimal() + xlab("Army Service") +
+    scale_x_discrete(labels = c("Served", "not Served")) +
+
+  geom_text(aes(label = scales::percent(Freq), y = Freq), 
+            position = position_dodge(width = 0.9), 
+            vjust = -0.5)
+
+
+
+
+```
+optional
+
+```{r}
+library(ggridges)
+ggplot(train, aes(x = Hope2, y = factor(T3army), fill = factor(T3army))) + 
+  geom_density_ridges(alpha = 0.5) + scale_fill_manual(values = c("#7DB84F", "#C11F1F"),
+                    labels = c("Served", "Did Not Served")) +
+    ylab("Army Service") + xlab("Level of Hope for the Future")+ labs(fill = "Army Service", title = "Distribution of Hope for the Future of At-Risk Youth\nAccording to Army Service")+ 
+    scale_y_discrete(labels = c("Served", "Did Not Served")) +
+  theme_minimal()
+
+```
