@@ -79,7 +79,6 @@ dim(test)
 table(train$T3army)
 train$T3army <- as.factor(train$T3army)
 test$T3army <- as.factor(test$T3army)
-# view(train$T3army)
 ```
 
 
@@ -257,10 +256,6 @@ train$Hacha8[is.na(train$Hacha8)] <- mean_value
 
 # HACHA4 HACHA5 HACHA6:
 
-
-median(train$Hacha4)
-median(train$Hacha5)
-median(train$Hacha6)
 
 train$Hacha4[!complete.cases(train$Hacha4)] <- median(train$Hacha4)
 train$Hacha5[!complete.cases(train$Hacha5)] <- median(train$Hacha5)
