@@ -356,23 +356,6 @@ train$T3army <- as.factor(train$T3army)
 view(train)
 train$M1.2 <- as.numeric(train$M1.2)
 test$M1.2 <- as.numeric(test$M1.2)
-# 
-# 
-# 
-# # Convert specific columns to numeric
-# numeric_cols <- c("B_life_skills_all", "M1.4", "M1.6", "SenseCont3", "Hope2", "HopeAll_T1", "Hope1", "M1.3", "SenseCont4", "SenseCont2", "SenseCont5", "SenseCont1", "SenseCont6", "Hacha10")
-# train[numeric_cols] <- lapply(train[numeric_cols], as.numeric)
-# 
-# # Convert the T3army column to a factor
-# train$T3army <- as.factor(train$T3army)
-# 
-# # Convert the M1.2 column to numeric in both train and test datasets
-# train$M1.2 <- as.numeric(train$M1.2)
-# test$M1.2 <- as.numeric(test$M1.2)
-# 
-# # View the updated train dataset
-# view(train)
-
 
 ```
 
