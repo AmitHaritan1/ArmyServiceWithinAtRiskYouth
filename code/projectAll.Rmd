@@ -494,21 +494,21 @@ predicted_vector <- ifelse(df_pred$.pred_1 >= cutoff_prob, 1, 2)
 
 df_table <- df_pred %>%
   mutate(
-    spam      = if_else(T3army == 1, "Served", "not Served"),
-    spam_pred = if_else(.pred_1 > cutoff_prob, "child labelled as Served", "child labelled as not Served")
+    army      = if_else(T3army == 1, "Served", "not Served"),
+    army_pred = if_else(.pred_1 > cutoff_prob, "child labelled as Served", "child labelled as not Served")
     ) %>%
-  count(spam_pred, spam) %>%
-  pivot_wider(names_from = spam, values_from = n)
+  count(army_pred, army) %>%
+  pivot_wider(names_from = army, values_from = n)
 
 
 df_mat <- as.matrix(df_table[,-1])
 df_mat[is.na(df_mat)] <- 0
 
 
-TP <- df_mat[1, 1] # not spam, not predicted
-FP <- df_mat[1, 2] # not spam, predicted
-FN <- df_mat[2, 1] # spam, not predicted
-TN <- df_mat[2, 2] # spam, predicted
+TP <- df_mat[1, 1] # not served, not predicted
+FP <- df_mat[1, 2] # not served, predicted
+FN <- df_mat[2, 1] # served, not predicted
+TN <- df_mat[2, 2] # served, predicted
 
 recall <- TP/(TP+FN)
 precision <- TP/(TP+FP)
@@ -571,10 +571,10 @@ example <- confusionMatrix(data=predictions, reference = test_rf$T3army)
 example
 
 
-TP <- confusion_matrix[1, 1] # not spam, not predicted
-FP <- confusion_matrix[1, 2] # not spam, predicted
-FN <- confusion_matrix[2, 1] # spam, not predicted
-TN <- confusion_matrix[2, 2] # spam, predicted
+TP <- confusion_matrix[1, 1] # not served, not predicted
+FP <- confusion_matrix[1, 2] # not served, predicted
+FN <- confusion_matrix[2, 1] # served, not predicted
+TN <- confusion_matrix[2, 2] # served, predicted
 
 recall <- TP/(TP+FN)
 precision <- TP/(TP+FP)
