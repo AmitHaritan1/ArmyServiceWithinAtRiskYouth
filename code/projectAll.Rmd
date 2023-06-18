@@ -25,7 +25,7 @@ library(pROC)
 ```
 
 
-```{r}
+```{r, message = FALSE, warning=FALSE}
 
 child_df <-haven::read_sav("child_risk.sav")
 
@@ -33,7 +33,7 @@ child_df <-haven::read_sav("child_risk.sav")
 
 # Change 2 to 0 and clean NA in the T3army column
 
-```{r}
+```{r, message = FALSE, warning=FALSE}
 # Create a new table without na on the T3army column 
 
 child_df_rmna <- child_df[complete.cases(child_df$T3army), ]
@@ -48,7 +48,7 @@ table(child_df_rmna$T3army)
 
 filter the data to the relevant columns and divide to train and test:
 
-```{r}
+```{r, message = FALSE, warning=FALSE}
 
 relevant_col_vec = c("T3army", "M1.2", "M1.3", "M1.4", "M1.5", "M1.6", "B_life_skills_all",
   "SenseCont1", "SenseCont2", "SenseCont3", "SenseCont4", "SenseCont5", "SenseCont6",
@@ -75,7 +75,7 @@ dim(train)
 dim(test)
 ```
 
-```{r}
+```{r, message = FALSE, warning=FALSE}
 table(train$T3army)
 train$T3army <- as.factor(train$T3army)
 test$T3army <- as.factor(test$T3army)
@@ -84,7 +84,7 @@ test$T3army <- as.factor(test$T3army)
 
 ## Preprocessing and Date Engineering:
 
-```{r}
+```{r, message = FALSE, warning=FALSE}
 
 # replacing ACE NA's with means:
 train$T3_ACE_1 <- na.aggregate(train$T3_ACE_1, FUN = median)
@@ -330,7 +330,7 @@ print(na_counts)
 
 #### Change columns to numeric
 
-```{r}
+```{r, message = FALSE, warning=FALSE}
 train$B_life_skills_all <- as.numeric(train$B_life_skills_all)
 train$M1.4 <- as.numeric(train$M1.4)
 train$M1.6 <- as.numeric(train$M1.6)
@@ -361,7 +361,7 @@ test$M1.2 <- as.numeric(test$M1.2)
 
 
 #### Feature Importence - Random Forest:
-```{r}
+```{r, message = FALSE, warning=FALSE}
 # Remove rows with missing values
 train2 <- na.omit(train)
 
@@ -386,7 +386,7 @@ print(importance)
 
 #### Fixing imbalances of the data
 
-```{r}
+```{r, message = FALSE, warning=FALSE}
 #  up-sampling the train , repair imbalnce data.
 
 train <- upSample(x = train[, -which(names(train) == "T3army")], y = train$T3army, yname = "T3army")
@@ -401,7 +401,7 @@ train <- upSample(x = train[, -which(names(train) == "T3army")], y = train$T3arm
 
 #### Logisitic Regression Between Families of Features
 
-```{r}
+```{r, message = FALSE, warning=FALSE}
 subset_df_ace <- train[, c("T3army", "T3_ACE_1", "T3_ACE_2", "T3_ACE_3", "T3_ACE_4", "T3_ACE_5", "T3_ACE_6", "T3_ACE_7", "T3_ACE_8", "T3_ACE_9")]
 
 subset_df_Hope <- train[, c("SenseCont1", "SenseCont2", "SenseCont3", "SenseCont4", "SenseCont5", "SenseCont6", "Hope1", "Hope2", "HopeAll_T1", "T3army")]
@@ -450,7 +450,7 @@ summary(logistic_model)
 
 #### Recipe:
 
-```{r}
+```{r, message = FALSE, warning=FALSE}
 # replace . with the columns we want as features
 df_rec <- recipe(
   T3army ~ .,
@@ -521,7 +521,7 @@ cat("Precision: ", precision, "\n")
 cat("F1-score: ", f1, "\n")
 ```
 
-```{r}
+```{r, message = FALSE, warning=FALSE}
 
 roc_object <- roc( test$T3army, as.numeric(predicted_vector))
 # calculate area under curve
@@ -537,7 +537,7 @@ plot(roc_object, main = "ROC Curve", print.auc = TRUE, auc.polygon = TRUE, grid 
 creating train with relevant features:
 
 
-```{r}
+```{r, message = FALSE, warning=FALSE}
 
 # train and test on clean data:
 
@@ -549,7 +549,7 @@ view(train_rf)
 
 
 
-```{r}
+```{r, message = FALSE, warning=FALSE}
 train_rf$T3army <- as.factor(train_rf$T3army)
 
 # Train a Random Forest model
@@ -590,7 +590,7 @@ cat("F1-score: ", f1, "\n")
 
 #### Optional - Correlation Between Signle
 
-```{r}
+```{r, message = FALSE, warning=FALSE}
 # Convert T3army column to numeric if it's not already numeric
 train$T3army <- as.numeric(as.character(train$T3army))
 
@@ -627,7 +627,7 @@ results_df
 #### Plots
 
 
-```{r}
+```{r, message = FALSE, warning=FALSE}
 
 #Gender
 
@@ -672,7 +672,7 @@ ggplot(data = df_table_data, aes(x = factor(Var2), y = Freq, fill = as.factor(Va
 ```
 optional
 
-```{r}
+```{r, message = FALSE, warning=FALSE}
 library(ggridges)
 ggplot(train, aes(x = Hope2, y = factor(T3army), fill = factor(T3army))) + 
   geom_density_ridges(alpha = 0.5) + scale_fill_manual(values = c("#7DB84F", "#C11F1F"),
