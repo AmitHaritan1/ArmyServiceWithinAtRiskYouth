@@ -353,7 +353,6 @@ train$Hacha10 <- as.numeric(train$Hacha10)
 
 
 train$T3army <- as.factor(train$T3army)
-view(train)
 train$M1.2 <- as.numeric(train$M1.2)
 test$M1.2 <- as.numeric(test$M1.2)
 
@@ -391,7 +390,6 @@ print(importance)
 
 train <- upSample(x = train[, -which(names(train) == "T3army")], y = train$T3army, yname = "T3army")
 
-# view(resampled_data)
 ```
 
 
@@ -544,7 +542,6 @@ creating train with relevant features:
 train_rf <- train[relevant_col_vec_rf]
 test_rf <- test[relevant_col_vec_rf]
 
-view(train_rf)
 ```
 
 
