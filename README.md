@@ -1,4 +1,3 @@
-
 # SISE2601 Project data description
 ### Army Service Within At-Risk Youth
 Final project in Advanced Data Analysis in R course
@@ -7,12 +6,23 @@ Final project in Advanced Data Analysis in R course
 
 Team name - Danielle Eldor, Shir Bernstein and Amit Haritan
 
+
+
 This markdown file describes the data folder structure and organization ...
+
+To reproduce the code, add to the current folder the data file “child_risk.sav” and run the code.
+
+The data suggests that childhood adversity and trauma, such as loss, parental issues, maltreatment, and social difficulties, can have long-lasting effects on individuals. These adverse experiences are associated with poor health, behavioral problems, and negative outcomes in adulthood, including mental health issues,  low incomes, and difficulties in education and employment. These effects tend to emerge during young adulthood, a critical phase when individuals transition into adult roles and responsibilities. If protective factors are lacking during childhood and adolescence, young adults who have experienced adverse childhood experiences may struggle to cope with the challenges they face, leading to lower adaptation and potential mental and behavioral dysfunction. The data measures 3 different time period throughout 10 years, of a constant group of at-risk youth.
+
+The element we are trying to predict is whether an at-risk teen will be recruited to the IDF in his or her future. For this, we will use the values of the column T3army, indicating if they got recruited or not, to test and compare to our models
+
+
 
 Data feature list (valid features):
 
 
 # T3Army:
+
 
 This field indicates whether a child serve in the army or not.
 Missing values were ignored.
@@ -23,7 +33,7 @@ Missing values were ignored.
 |   2   |  Did not served |
 
 
-# Life skils features:
+# Life skils features
 
 There are 5 scales of preparedness to an independent adult life.
 All scales set between 1-4 with gaps of 0.25, and each field contains a specific category:
@@ -36,7 +46,7 @@ All scales set between 1-4 with gaps of 0.25, and each field contains a specific
   
   - B_life_skills_all - summarizes the children's skills of the 2nd measurement (T2).
     This column has continuous values acseding from 1-4.
-  
+
   
 # Hopes:
 
@@ -84,6 +94,7 @@ B.EDUCATION - This field indicates the children answer about "What education or 
 
 # Traumas:
 
+
 The next fields contain descriptions of traumatic events that the teens may have experienced during their childhood up to the age of 18. The answers are labeled as following:
 
 | Value |  Label |
@@ -126,6 +137,7 @@ Hacha3 and Hacha10 are about the army preparation:
 
 T3gender -  This field contains the children's gender:
 
+
 | Value |  Label |
 |:-----:|:------:|
 |   1   |  women |
@@ -133,6 +145,7 @@ T3gender -  This field contains the children's gender:
 
 
 T3religiousness - This field indicates the children's level of religiousness:
+
 
 | Value |           Label           |
 |:-----:|:-------------------------:|
