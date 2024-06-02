@@ -6,6 +6,8 @@ Final project in Advanced Data Analysis in R course
 
 Team name - Danielle Eldor, Shir Bernstein and Amit Haritan
 
+
+
 This markdown file describes the data folder structure and organization ...
 
 To reproduce the code, add to the current folder the data file “child_risk.sav” and run the code.
@@ -14,10 +16,13 @@ The data suggests that childhood adversity and trauma, such as loss, parental is
 
 The element we are trying to predict is whether an at-risk teen will be recruited to the IDF in his or her future. For this, we will use the values of the column T3army, indicating if they got recruited or not, to test and compare to our models
 
+
+
 Data feature list (valid features):
 
 
-# T3Army
+# T3Army:
+
 
 This field indicates whether a child serve in the army or not.
 Missing values were ignored.
@@ -41,9 +46,9 @@ All scales set between 1-4 with gaps of 0.25, and each field contains a specific
   
   - B_life_skills_all - summarizes the children's skills of the 2nd measurement (T2).
     This column has continuous values acseding from 1-4.
+
   
-  
-# Hopes
+# Hopes:
 
 There are 6 sentences that show the child's depiction of future struggles and coping in scale of 1-5:
 
@@ -87,7 +92,8 @@ B.EDUCATION - This field indicates the children answer about "What education or 
                 
 
 
-# Traumas
+# Traumas:
+
 
 The next fields contain descriptions of traumatic events that the teens may have experienced during their childhood up to the age of 18. The answers are labeled as following:
 
@@ -127,9 +133,10 @@ Hacha3 and Hacha10 are about the army preparation:
 
 
 
-# General
+# General:
 
-- T3gender -  This field contains the children's gender:
+T3gender -  This field contains the children's gender:
+
 
 | Value |  Label |
 |:-----:|:------:|
@@ -137,7 +144,8 @@ Hacha3 and Hacha10 are about the army preparation:
 |   2   |   men  |
 
 
-- T3religiousness - This field indicates the children's level of religiousness:
+T3religiousness - This field indicates the children's level of religiousness:
+
 
 | Value |           Label           |
 |:-----:|:-------------------------:|
